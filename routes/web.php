@@ -55,6 +55,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin', 'as' => 'admin.
     Route::get('customer/{id}/edit', [CustomerController::class, 'edit'])->name('customers.edit')->middleware('permission:edit customer');
     Route::post('customer/{id}', [CustomerController::class, 'update'])->name('customers.update')->middleware('permission:edit customer');
     Route::delete('customer/{id}', [CustomerController::class, 'destroy'])->name('customers.destroy')->middleware('permission:delete customer');
+    Route::get('customer/export-fields', [CustomerController::class, 'exportSelectedFields'])->name('customers.export.fields');
+
 
     Route::get('products', [ProductController::class, 'index'])->name('products.index')->middleware('permission:view product');
     Route::get('products/create', [ProductController::class, 'create'])->name('products.create')->middleware('permission:add product');
@@ -67,4 +69,3 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin', 'as' => 'admin.
     // Route::resource('products', ProductController::class)->middleware('permission:manage products');
 
 });
-

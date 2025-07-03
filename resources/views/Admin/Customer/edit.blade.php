@@ -75,7 +75,7 @@
                                     <div class="col-lg-4 col-md-4">
                                         <div class="mb-2">
                                             <label class="form-label">Address <span class="text-danger">*</span></label>
-                                            <textarea name="address" class="form-control" placeholder="Address" rows="5">{{ $customer->address }}</textarea>
+                                            <textarea name="address" class="form-control" placeholder="Address" rows="1">{{ $customer->address }}</textarea>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-4">
@@ -93,12 +93,64 @@
                                      <div class="row m-0 p-0">
                                         <div class="col-lg-12" id="trackingFields">
                                             <div class="row">
+                                                <!-- District -->
                                                 <div class="col-lg-4 col-md-4">
                                                     <div class="mb-2">
-                                                        <label class="form-label">IOT SIM Number <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" name="iot_sim_number" placeholder="IOT SIM Number" value="{{ $customer->iot_sim_number }}">
+                                                        <label class="form-label">District <span class="text-danger">*</span></label>
+                                                        <input type="text" name="district" class="form-control" value="{{ old('district', $customer->district) }}">
                                                     </div>
                                                 </div>
+                                                <div class="col-lg-4 col-md-4">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                                                        <input type="text" name="username" class="form-control" value="{{ old('username', $customer->username) }}">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Vehicle Number -->
+                                                <div class="col-lg-4 col-md-4">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">Vehicle Number <span class="text-danger">*</span></label>
+                                                        <input type="text" name="vehicle_number" class="form-control" value="{{ old('vehicle_number', $customer->vehicle_number) }}">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Dealer Type -->
+                                                <div class="col-lg-4 col-md-4">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">Dealer Type <span class="text-danger">*</span></label>
+                                                        <select name="dealer_type" class="form-control" onchange="toggleDealerName(this.value)">
+                                                            <option value="Direct" {{ old('dealer_type', $customer->dealer_type) == 'Direct' ? 'selected' : '' }}>Direct</option>
+                                                            <option value="Dealer" {{ old('dealer_type', $customer->dealer_type) == 'Dealer' ? 'selected' : '' }}>Dealer</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Dealer Name -->
+                                                <div class="col-lg-4 col-md-4" id="dealerNameField" style="display: {{ old('dealer_type', $customer->dealer_type) == 'Dealer' ? 'block' : 'none' }};">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">Dealer Name</label>
+                                                        <input type="text" name="dealer_name" class="form-control" value="{{ old('dealer_name', $customer->dealer_name) }}">
+                                                    </div>
+                                                </div>
+                                                 <div class="col-lg-4 col-md-4">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">Select Software Name <span class="text-danger">*</span></label>
+                                                        {{-- <input type="text"  class="form-control"name="software_name" placeholder="Software Name (VTS or GPS)" value="{{ old('software_name') }}"> --}}
+                                                        <select name="software_name" class="form-control">
+                                                            <option value="GPS" {{ old('software_name',$customer->software_name) == 'GPS' ? 'selected' : '' }}>GPS</option>
+                                                            <option value="VTS" {{ old('software_name',$customer->software_name) == 'VTS' ? 'selected' : '' }}>VTS</option>
+                                                            <option value="AIS" {{ old('software_name',$customer->software_name) == 'AIS' ? 'selected' : '' }}>AIS</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                {{-- <div class="col-lg-4 col-md-4">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">Software Name (VTS or GPS) <span class="text-danger">*</span></label>
+                                                        <input type="text"  class="form-control"name="software_name" placeholder="Software Name (VTS or GPS)" value="{{ $customer->software_name }}">
+                                                    </div>
+                                                </div> --}}
+
                                                 <div class="col-lg-4 col-md-4">
                                                     <div class="mb-2">
                                                         <label class="form-label">Installed Date <span class="text-danger">*</span></label>
@@ -113,8 +165,14 @@
                                                 </div>
                                                 <div class="col-lg-4 col-md-4">
                                                     <div class="mb-2">
-                                                        <label class="form-label">Software Name (VTS or GPS) <span class="text-danger">*</span></label>
-                                                        <input type="text"  class="form-control"name="software_name" placeholder="Software Name (VTS or GPS)" value="{{ $customer->software_name }}">
+                                                        <label class="form-label">IOT SIM Number <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" name="iot_sim_number" placeholder="IOT SIM Number" value="{{ $customer->iot_sim_number }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">IMEI Number<span class="text-danger">*</span></label>
+                                                        <input type="text"  class="form-control"name="imei_number" placeholder="IMEI Number" value="{{ $customer->imei_number }}">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4 col-md-4">

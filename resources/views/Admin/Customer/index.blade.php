@@ -56,7 +56,13 @@
                              <div class="col-1 d-flex justify-content-start">
                              <a href="{{ route('admin.customers.index') }}" class="btn btn-secondary w-100">Reset</a>
                             </div>
+                            <div class="col-3">
+                        <button type="button" class="btn btn-success" onclick="openExportPopup()">Export</button>
+                        </div>
                         </form>
+
+                        <!-- Export Button -->
+
                        </div>
                         <table class="table table-hover mb-0">
                             <thead>
@@ -65,6 +71,8 @@
                                     <th>customer</th>
                                     <th>Type</th>
                                     <th>Software Name</th>
+                                    <th>IMEI Number</th>
+                                    <th>IOT Number</th>
                                     <th>Phone</th>
                                     <th>Installed On</th>
                                     <th>Expiry On</th>
@@ -90,7 +98,9 @@
                                     </td>
                                     <td>{{ $customer->type }}</td>
                                     <td>{{ $customer->software_name }}</td>
-                                    <td>{{ $customer->contact1 }}, {{ $customer->contact2 }}</td>
+                                    <td>{{ $customer->imei_number }}</td>
+                                    <td>{{ $customer->iot_sim_number }}</td>
+                                    <td>{{ $customer->contact1 }}<br> {{ $customer->contact2 }}</td>
                                     <td>{{ $customer->start_date ? \carbon\Carbon::parse($customer->start_date)->format('d-M-Y'):'' }}</td>
                                     <td>{{ Carbon\Carbon::parse($customer->expiry_date)->format('d-M-Y') }}</td>
                                     <td>{{ $customer->technician_name }}</td>
@@ -114,6 +124,12 @@
                                         data-contact2="{{ $customer->contact2 }}"
                                         data-comment="{{ $customer->comment }}"
                                         data-tech="{{ $customer->technician_name }}"
+                                        data-imei="{{ $customer->imei_number }}"
+                                        data-username="{{ $customer->username }}"
+                                        data-vehiclenumber="{{ $customer->vehicle_number }}"
+                                        data-dealertype="{{ $customer->dealer_type }}"
+                                        data-dealername="{{ $customer->dealer_name }}"
+                                        data-district="{{ $customer->district }}"
                                         data-start="{{ \Carbon\Carbon::parse($customer->start_date)->format('d-M-Y') }}"
                                         data-expiry="{{ \Carbon\Carbon::parse($customer->expiry_date)->format('d-M-Y') }}"
                                         data-created="{{ $customer->created_at != $customer->updated_at ? $customer->updated_at->format('d-m-Y h:i A') . ' ' : $customer->created_at->format('d-m-Y h:i A') . ' ' }}"
@@ -191,6 +207,152 @@
         </div>
     </div>
 </div>
+{{-- <div id="exportPopup" class="custom-popup">
+    <div class="custom-popup-content">
+        <span class="custom-close-btn" onclick="closeExportPopup()">&times;</span>
+        <h5>Select Fields and Type to Export</h5>
+        <form id="exportForm" method="GET" action="{{ route('admin.customers.export.fields') }}">
+            <div class="mb-2">
+            <label>Select Customer Type:</label><br>
+            <label><input type="checkbox" name="types[]" value="all" id="typeAll" onchange="toggleTypeCheckboxes(this)"> All</label>
+            <label><input type="checkbox" name="types[]" value="Tracking" class="type-checkbox"> Tracking</label>
+            <label><input type="checkbox" name="types[]" value="Other" class="type-checkbox"> Other</label>
+        </div>
+            <div class="mb-2">
+                <label><input type="checkbox" name="fields[]" value="name" checked> Name</label><br>
+                <label><input type="checkbox" name="fields[]" value="email"> Email</label><br>
+                <label><input type="checkbox" name="fields[]" value="contact1"> Contact 1</label><br>
+                <label><input type="checkbox" name="fields[]" value="contact2"> Contact 2</label><br>
+                <label><input type="checkbox" name="fields[]" value="software_name"> Software</label><br>
+                <label><input type="checkbox" name="fields[]" value="imei_number"> IMEI</label><br>
+                <label><input type="checkbox" name="fields[]" value="iot_sim_number"> IOT Sim Number</label><br>
+                <label><input type="checkbox" name="fields[]" value="start_date"> Installed On</label><br>
+                <label><input type="checkbox" name="fields[]" value="expiry_date"> Expiry On</label><br>
+                <label><input type="checkbox" name="fields[]" value="technician_name"> Technician</label><br>
+            </div>
+            <button type="submit" class="btn btn-primary">Export Now</button>
+        </form>
+    </div>
+</div> --}}
+<div id="exportPopup" class="custom-popup">
+    <div class="custom-popup-content">
+        <span class="custom-close-btn" onclick="closeExportPopup()">&times;</span>
+        <h5>Select Fields and Type to Export</h5>
+        <form id="exportForm" method="GET" action="{{ route('admin.customers.export.fields') }}">
+
+            <!-- Customer Type Selection -->
+            <div class="mb-2">
+                <label>Select Customer Type:</label><br>
+                <label><input type="checkbox" name="types[]" value="all" id="typeAll" onchange="toggleTypeCheckboxes(this)"> All</label>
+                <label><input type="checkbox" name="types[]" value="Tracking" class="type-checkbox"> Tracking</label>
+                <label><input type="checkbox" name="types[]" value="Other" class="type-checkbox"> Other</label>
+            </div>
+
+            <!-- Field Selection -->
+            <div class="mb-2">
+                <label><input type="checkbox" name="fields[]" value="name" checked> Name</label><br>
+                <label><input type="checkbox" name="fields[]" value="email"> Email</label><br>
+                <label><input type="checkbox" name="fields[]" value="address"> Address</label><br>
+                <label><input type="checkbox" name="fields[]" value="contact1"> Contact 1</label><br>
+                <label><input type="checkbox" name="fields[]" value="contact2"> Contact 2</label><br>
+                <label><input type="checkbox" name="fields[]" value="username"> Username</label><br>
+                <label><input type="checkbox" name="fields[]" value="vehicle_number"> Vechile Number</label><br>
+                <label><input type="checkbox" name="fields[]" value="district"> District</label><br>
+                <label><input type="checkbox" name="fields[]" value="dealer_type"> Dealer Type</label><br>
+                <label><input type="checkbox" name="fields[]" value="dealer_name"> Dealer Name</label><br>
+                <label><input type="checkbox" name="fields[]" value="software_name"> Software</label><br>
+                <label><input type="checkbox" name="fields[]" value="imei_number"> IMEI</label><br>
+                <label><input type="checkbox" name="fields[]" value="iot_sim_number"> IOT Sim Number</label><br>
+                <label><input type="checkbox" name="fields[]" value="start_date"> Installed On</label><br>
+                <label><input type="checkbox" name="fields[]" value="expiry_date"> Expiry On</label><br>
+                <label><input type="checkbox" name="fields[]" value="technician_name"> Technician</label><br>
+            </div>
+
+            <!-- New District Filter Field -->
+            <div class="mb-2">
+                <label>Filter by District (optional):</label>
+                <input type="text" name="district" class="form-control" placeholder="e.g. Palakkad">
+            </div>
+
+            <!-- Export Button -->
+            {{-- <button type="submit" class="btn btn-primary" onclick="closeExportPopup()">Export Now</button> --}}
+            <button type="submit" class="btn btn-primary" id="exportSubmitBtn">Export Now</button>
+        </form>
+    </div>
+</div>
+<div id="loadingIndicator" style="display: none; margin-top: 10px;">
+    <span class="spinner-border text-primary" role="status" aria-hidden="true"></span> Exporting...
+</div>
+
+<script>
+   $('#exportForm').on('submit', function () {
+    setTimeout(function () {
+        $('#customPopup').hide(); // or use `.modal('hide')` if it's a Bootstrap modal
+    }, 1000);
+});
+
+</script>
+
+<script>
+function toggleTypeCheckboxes(allCheckbox) {
+    const checkboxes = document.querySelectorAll('.type-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = allCheckbox.checked;
+    });
+}
+
+// If user unchecks one, remove "All" selection
+document.querySelectorAll('.type-checkbox').forEach(cb => {
+    cb.addEventListener('change', function () {
+        if (!this.checked) {
+            document.getElementById('typeAll').checked = false;
+        }
+    });
+});
+</script>
+
+<script>
+    function openExportPopup() {
+        document.getElementById('exportPopup').style.display = 'flex';
+    }
+
+    function closeExportPopup() {
+        document.getElementById('exportPopup').style.display = 'none';
+    }
+
+    // Close popup when clicking outside the modal
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('exportPopup');
+        if (event.target === modal) {
+            closeExportPopup();
+        }
+    });
+</script>
+<script>
+    document.getElementById('exportForm').addEventListener('submit', function (e) {
+        // Show loading
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        // Disable the button to prevent multiple clicks
+        document.getElementById('exportSubmitBtn').disabled = true;
+        document.getElementById('exportSubmitBtn').innerText = 'Exporting...';
+
+        // Smooth fade-out of popup after delay
+        setTimeout(() => {
+            document.getElementById('exportPopup').style.opacity = '0';
+            document.getElementById('exportPopup').style.transition = 'opacity 0.5s ease';
+
+            setTimeout(() => {
+                document.getElementById('exportPopup').style.display = 'none';
+                document.getElementById('exportPopup').style.opacity = '1'; // Reset
+                document.getElementById('exportSubmitBtn').disabled = false;
+                document.getElementById('exportSubmitBtn').innerText = 'Export Now';
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }, 500);
+        }, 300); // Adjust delay as needed
+    });
+</script>
+
 <!-- Custom Customer Popup -->
 <div id="customPopup" class="custom-popup">
     <div class="custom-popup-content">
@@ -213,21 +375,43 @@
                                                 <th>Address:</th>
                                                 <td><span id="popupAddress"></span></td>
                                                 </tr>
-                                                 <tr>
+                                                <tr>
+                                                <th>Contact:</th>
+                                                <td><span id="popupContact1"></span>, <span id="popupContact2"></span></td>
+                                                </tr>
+                                                <tr>
+                                                <th>District:</th>
+                                                <td><span id="popupDistrict"></span></td>
+                                                </tr>
+                                                <tr>
                                                 <th>Type:</th>
                                                 <td><span id="popupType"></span></td>
+                                                </tr>
+                                                <tr>
+                                                <th>User Name:</th>
+                                                <td><span id="popupUsername"></span></td>
+                                                </tr>
+                                                <tr>
+                                                <th>Dealer Type:</th>
+                                                <td><span id="popupDealerType"></span></td>
+                                                </tr>
+                                                <tr>
+                                                <tr>
+                                                <th>Delaer Name:</th>
+                                                <td><span id="popupDealerName"></span></td>
+                                                </tr>
+                                                <tr>
+                                                <tr>
+                                                <th>Vehicle Number:</th>
+                                                <td><span id="popupVehicle"></span></td>
                                                 </tr>
                                                 <tr>
                                                 <th>Software:</th>
                                                 <td><span id="popupSoftware"></span></td>
                                                 </tr>
                                                 <tr>
-                                                <th>Contact 1:</th>
-                                                <td><span id="popupContact1"></span></td>
-                                                </tr>
-                                                <tr>
-                                                <th>Contact 2:</th>
-                                                <td><span id="popupContact2"></span></td>
+                                                <th>IMEI Number:</th>
+                                                <td><span id="popupImei"></span></td>
                                                 </tr>
                                                 <tr>
                                                 <th>Purchase Details:</th>
@@ -323,7 +507,7 @@ window.onclick = function(event) {
     padding: 20px 30px;
     border-radius: 10px;
     width: 90%;
-    max-width: 600px;
+    max-width: 800px;
     position: relative;
 }
 
@@ -430,6 +614,12 @@ window.onclick = function(event) {
             document.getElementById("popupStart").innerText = this.dataset.start;
             document.getElementById("popupTech").innerText = this.dataset.tech;
             document.getElementById("popupCreated").innerText = this.dataset.created;
+            document.getElementById("popupImei").innerText = this.dataset.imei;
+            document.getElementById("popupUsername").innerText = this.dataset.username;
+            document.getElementById("popupDealerType").innerText = this.dataset.dealertype;
+            document.getElementById("popupDealerName").innerText = this.dataset.dealername;
+            document.getElementById("popupDistrict").innerText = this.dataset.district;
+            document.getElementById("popupVehicle").innerText = this.dataset.vehiclenumber;
 
             popup.style.display = "flex";
         });
